@@ -46,11 +46,6 @@ transcripts["Quarter"] = pd.to_datetime(transcripts.TextDateTime).dt.quarter
 #%%
 audios["Quarter"].head()
 
-
-#%%
-transcripts["Quarter"] = pd.to_datetime(transcripts["TextDateTime"]).dt.quarter
-
-
 #%%
 transcripts["Quarter"]=transcripts["Quarter"].fillna(0)
 transcripts["Quarter"] = transcripts["Quarter"].astype(int)
@@ -58,20 +53,31 @@ transcripts["Quarter"] = transcripts["Quarter"].astype(int)
 
 #%%
 date_list = []
-for date in transcripts["TextDateTime"]:
-    date_list.append(date[5:7]+ "/" + date[8:10] + "/" + date[0:4])
-transcripts["Date"]= pd.DataFrame(date_list)
+count =0
+for date in transcripts.TextDateTime:
+        try:
+                temp = date[5:7]+ "/" + date[8:10] + "/" + date[0:4]
+                
+        except BaseException:
+                date_list.append(0)
+        else:
+                 date_list.append(temp)
+        
+
 
 
 #%%
 filename_list = []
-for row in audios.itertuples(index=True, name='Pandas'):
-    for transcript in transcripts.itertuples(index=True, name='Pandas'):
+for transcript in transcripts.itertuples(index=True, name='Pandas'):
+    flag = False
+    for audio in audios.itertuples(index=True, name='Pandas'):
         if (transcript[3]==audio[1]) and (transcript[7]==audio[3]) and (transcript[15]==audio[2][1]) and (transcript[16]==audio[7]) and (transcript[1]==audio[4]):
-            filename.append(audio[11])
+            filename_list.append(audio[11])
+            flag = True
             break
-    filename.append("NaN")    
-        
+    if(not flag):
+        filename_list.append("NaN")    
+#%%        
 transcripts_final["the corresponding audio file name"] = pd.DataFrame(filename_list)
 #%% [markdown]
 # audio conversion
